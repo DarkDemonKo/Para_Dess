@@ -3,147 +3,261 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flores Amarillas para Ti</title>
+    <title>Un Regalo de Flores Amarillas</title>
+    <!-- Importar fuente de Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary-yellow: #FFD700; /* Amarillo Oro */
+            --center-orange: #FFA500; /* Naranja */
+            --background-light: #fff8e1; /* Crema muy claro */
+            --background-dark: #ffecb3;  /* Amarillo pálido */
+            --text-color: #5d4037; /* Marrón oscuro */
+        }
+
         body {
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            height: 100vh;
+            background: linear-gradient(135deg, var(--background-light) 0%, var(--background-dark) 100%);
+            overflow: hidden; /* Evita barras de scroll */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* --- Pantalla inicial --- */
+        #initial-screen {
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #f0f8ff; /* Azul claro muy suave */
-            overflow: hidden; /* Para que las flores no se salgan del área visible al aparecer */
-            font-family: 'Comic Sans MS', cursive, sans-serif; /* Fuente divertida */
+            text-align: center;
+            transition: opacity 1s ease-out, transform 1s ease-out;
         }
 
-        .flower-container {
-            position: relative;
+        #initial-screen.hidden {
+            opacity: 0;
+            transform: scale(0.8);
+            pointer-events: none;
+        }
+        
+        #initial-screen h1 {
+            font-family: 'Great Vibes', cursive;
+            font-size: 3.5em;
+            color: var(--text-color);
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        #gift-button {
+            background-color: var(--primary-yellow);
+            color: var(--text-color);
+            border: 2px solid var(--text-color);
+            padding: 15px 30px;
+            font-size: 1.2em;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        #gift-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        /* --- Contenedor de la animación --- */
+        #animation-container {
+            position: absolute;
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-wrap: wrap; /* Permite que las flores se distribuyan */
+            pointer-events: none; /* Permite interactuar con elementos detrás si los hubiera */
         }
 
+        /* --- Estilo de las flores --- */
         .flower {
             position: absolute;
-            opacity: 0;
-            transform: scale(0);
-            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
-            pointer-events: none; /* Ignorar eventos del ratón */
+            top: -100px; /* Inician fuera de la pantalla */
+            width: 60px;
+            height: 60px;
+            --rotation: 0deg; /* Variable CSS para la rotación final */
+            transition: top linear; /* Solo animamos la caída con transition */
+            animation: sway ease-in-out infinite alternate; /* La animación de balanceo es permanente */
         }
 
-        .petal {
-            background-color: #ffd700; /* Amarillo oro */
-            border-radius: 50%;
-            position: absolute;
-            width: 30px; /* Tamaño de los pétalos */
-            height: 30px;
-            box-shadow: 0 0 8px rgba(255, 215, 0, 0.7);
+        .flower svg {
+            width: 100%;
+            height: 100%;
+            filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.7));
         }
 
-        .center {
-            background-color: #ffa500; /* Naranja para el centro */
-            border-radius: 50%;
-            position: absolute;
-            width: 25px; /* Tamaño del centro */
-            height: 25px;
-            z-index: 1; /* Para que esté por encima de los pétalos */
-            box-shadow: 0 0 10px rgba(255, 165, 0, 0.8);
-        }
-
+        /* --- Mensaje Final --- */
         .message {
             position: absolute;
-            bottom: 20px; /* Abajo de la pantalla */
-            background-color: rgba(255, 255, 255, 0.9);
-            padding: 15px 25px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            font-size: 1.5em;
-            color: #333;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px); /* Inicia abajo y fuera de vista */
+            background-color: rgba(255, 255, 255, 0.95);
+            padding: 20px 30px;
+            border-radius: 20px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            font-family: 'Great Vibes', cursive;
+            font-size: 2.5em;
+            color: var(--text-color);
             text-align: center;
             opacity: 0;
-            transform: translateY(20px);
             transition: opacity 1s ease-out, transform 1s ease-out;
-            max-width: 80%;
+            max-width: 90%;
+            z-index: 10;
         }
 
         .message.show {
             opacity: 1;
-            transform: translateY(0);
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* --- Animaciones --- */
+        @keyframes sway {
+            from {
+                transform: rotate(calc(var(--rotation) - 5deg)) translateX(-15px);
+            }
+            to {
+                transform: rotate(calc(var(--rotation) + 5deg)) translateX(15px);
+            }
         }
     </style>
 </head>
 <body>
-    <div class="flower-container" id="flowerContainer"></div>
-    <div class="message" id="animatedMessage">
-        Son para ti tontita, no serán físicas aún, pero al menos te puedo dar unas virtuales con lo que sé hacer.
+
+    <!-- Pantalla Inicial con el botón -->
+    <main id="initial-screen">
+        <h1>Un Pequeño Regalo para Ti</h1>
+        <button id="gift-button">Abrir Regalo</button>
+    </main>
+    
+    <!-- Contenedor para las flores y el mensaje -->
+    <div id="animation-container">
+        <div class="message" id="animatedMessage">
+            Son para ti tontita, no serán físicas aún, pero al menos te puedo dar unas virtuales con lo que sé hacer.
+        </div>
     </div>
 
+    <!-- Elemento de audio -->
+    <audio id="background-music" loop>
+        <source src="https://www.chosic.com/wp-content/uploads/2022/01/childhood.mp3" type="audio/mpeg">
+        Tu navegador no soporta el elemento de audio.
+    </audio>
+
     <script>
-        const flowerContainer = document.getElementById('flowerContainer');
+        const giftButton = document.getElementById('gift-button');
+        const initialScreen = document.getElementById('initial-screen');
+        const animationContainer = document.getElementById('animation-container');
         const animatedMessage = document.getElementById('animatedMessage');
-        const numberOfFlowers = 15; // Número de flores a aparecer
-        const animationDelay = 300; // Retraso entre cada flor (milisegundos)
+        const backgroundMusic = document.getElementById('background-music');
+        
+        const numberOfFlowers = 200;
+        const flowerWidth = 60; // Ancho de la flor para los cálculos de colisión
+        const flowerHeight = 60; // Alto de la flor
+
+        // Preparamos las "columnas" para apilar las flores y evitar superposiciones
+        const numSlots = Math.floor(window.innerWidth / flowerWidth);
+        // Array para guardar la altura actual de la pila en cada columna
+        // Se inicia con la altura de la ventana (el suelo)
+        let pileHeights = new Array(numSlots).fill(window.innerHeight);
+
+        const flowerSVG = `
+            <svg viewBox="-60 -60 120 120" xmlns="http://www.w3.org/2000/svg">
+                <g>
+                    <!-- Creamos 8 pétalos rotando una sola forma -->
+                    <path d="M0,0 Q-15,-30 0,-50 Q15,-30 0,0 Z" fill="${getComputedStyle(document.documentElement).getPropertyValue('--primary-yellow')}" transform="rotate(0)"/>
+                    <path d="M0,0 Q-15,-30 0,-50 Q15,-30 0,0 Z" fill="${getComputedStyle(document.documentElement).getPropertyValue('--primary-yellow')}" transform="rotate(45)"/>
+                    <path d="M0,0 Q-15,-30 0,-50 Q15,-30 0,0 Z" fill="${getComputedStyle(document.documentElement).getPropertyValue('--primary-yellow')}" transform="rotate(90)"/>
+                    <path d="M0,0 Q-15,-30 0,-50 Q15,-30 0,0 Z" fill="${getComputedStyle(document.documentElement).getPropertyValue('--primary-yellow')}" transform="rotate(135)"/>
+                    <path d="M0,0 Q-15,-30 0,-50 Q15,-30 0,0 Z" fill="${getComputedStyle(document.documentElement).getPropertyValue('--primary-yellow')}" transform="rotate(180)"/>
+                    <path d="M0,0 Q-15,-30 0,-50 Q15,-30 0,0 Z" fill="${getComputedStyle(document.documentElement).getPropertyValue('--primary-yellow')}" transform="rotate(225)"/>
+                    <path d="M0,0 Q-15,-30 0,-50 Q15,-30 0,0 Z" fill="${getComputedStyle(document.documentElement).getPropertyValue('--primary-yellow')}" transform="rotate(270)"/>
+                    <path d="M0,0 Q-15,-30 0,-50 Q15,-30 0,0 Z" fill="${getComputedStyle(document.documentElement).getPropertyValue('--primary-yellow')}" transform="rotate(315)"/>
+                </g>
+                <circle cx="0" cy="0" r="15" fill="${getComputedStyle(document.documentElement).getPropertyValue('--center-orange')}"/>
+            </svg>
+        `;
 
         function createFlower() {
             const flower = document.createElement('div');
             flower.classList.add('flower');
-
-            // Centro de la flor
-            const center = document.createElement('div');
-            center.classList.add('center');
-            flower.appendChild(center);
-
-            // Pétalos (usaremos 8 pétalos equidistantes)
-            for (let i = 0; i < 8; i++) {
-                const petal = document.createElement('div');
-                petal.classList.add('petal');
-                const angle = i * (360 / 8); // Ángulo para cada pétalo
-                const radius = 25; // Distancia del pétalo al centro
-                petal.style.transform = `rotate(${angle}deg) translate(${radius}px)`;
-                flower.appendChild(petal);
-            }
-
-            // Posición aleatoria dentro del contenedor
-            const containerWidth = flowerContainer.clientWidth;
-            const containerHeight = flowerContainer.clientHeight;
-            // Aseguramos que la flor no aparezca demasiado cerca del borde
-            const margin = 50; 
-            const randomX = Math.random() * (containerWidth - 2 * margin) + margin;
-            const randomY = Math.random() * (containerHeight - 2 * margin) + margin;
+            flower.innerHTML = flowerSVG;
             
-            flower.style.left = `${randomX}px`;
-            flower.style.top = `${randomY}px`;
-            
+            // Duración de balanceo aleatoria para un efecto más natural
+            const swayDuration = Math.random() * 2 + 3;   // Entre 3 y 5 segundos
+            flower.style.animationDuration = `${swayDuration}s`;
+
             return flower;
         }
 
-        function animateFlowers() {
-            let flowerCount = 0;
-            const interval = setInterval(() => {
-                if (flowerCount < numberOfFlowers) {
+        function startAnimation() {
+            // Generar flores a intervalos
+            for (let i = 0; i < numberOfFlowers; i++) {
+                setTimeout(() => {
                     const newFlower = createFlower();
-                    flowerContainer.appendChild(newFlower);
-                    // Forzar el reflow para que la transición funcione
-                    void newFlower.offsetWidth; 
-                    newFlower.style.opacity = 1;
-                    newFlower.style.transform = 'scale(1)';
-                    flowerCount++;
-                } else {
-                    clearInterval(interval);
-                    // Mostrar el mensaje una vez que todas las flores han aparecido
-                    setTimeout(() => {
-                        animatedMessage.classList.add('show');
-                    }, 500); // Pequeño retraso antes de mostrar el mensaje
-                }
-            }, animationDelay);
-        }
+                    
+                    // --- Lógica de Colisión/Apilamiento ---
+                    // 1. Elegir una columna (slot) al azar para que caiga la flor
+                    const slotIndex = Math.floor(Math.random() * numSlots);
 
-        // Inicia la animación cuando la página esté cargada
-        window.onload = animateFlowers;
+                    // 2. Calcular la posición X final con una pequeña variación para que no sea una línea perfecta
+                    const finalX = (slotIndex * flowerWidth) + (Math.random() * 10 - 5);
+                    newFlower.style.left = `${finalX}px`;
+
+                    // 3. Calcular la posición Y final basada en la altura actual de la pila en esa columna
+                    const pileTop = pileHeights[slotIndex];
+                    // La flor se posará un poco encima de la anterior para un efecto más natural
+                    const finalY = pileTop - (flowerHeight * 0.4); 
+
+                    // 4. Actualizar la altura de la pila para la siguiente flor que caiga en esta columna
+                    pileHeights[slotIndex] = finalY;
+                    // --- Fin de la Lógica de Colisión ---
+
+                    animationContainer.appendChild(newFlower);
+
+                    // Forzar un reflow del navegador para que la transición se aplique correctamente
+                    void newFlower.offsetWidth;
+
+                    // Calcular el resto de la animación
+                    const finalRotation = Math.random() * 90 - 45; // Rotación final entre -45 y 45 grados
+                    const fallDuration = Math.random() * 5 + 8; // Duración de caída entre 8 y 13 segundos
+
+                    // Aplicar los estilos finales para iniciar la transición de caída
+                    newFlower.style.transition = `top ${fallDuration}s linear`;
+                    newFlower.style.setProperty('--rotation', `${finalRotation}deg`);
+                    newFlower.style.top = `${finalY}px`;
+
+                }, i * 100); // Espaciar la creación de cada flor 100ms
+            }
+
+            // Mostrar el mensaje cuando la flor número 25 es creada
+            setTimeout(() => {
+                animatedMessage.classList.add('show');
+            }, 24 * 100); // 24 * 100ms = 2.4 segundos
+        }
+        
+        giftButton.addEventListener('click', () => {
+            // Ocultar la pantalla inicial
+            initialScreen.classList.add('hidden');
+            
+            // Reproducir música (los navegadores modernos requieren interacción del usuario)
+            backgroundMusic.play().catch(error => {
+                console.log("La reproducción automática fue prevenida por el navegador.");
+            });
+
+            // Iniciar la animación de flores y el mensaje después de que la pantalla inicial se desvanezca
+            setTimeout(startAnimation, 1000);
+        });
     </script>
 </body>
 </html>
+
