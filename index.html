@@ -83,8 +83,7 @@
         .flower {
             position: absolute;
             top: -100px; /* Inician fuera de la pantalla */
-            width: 60px;
-            height: 60px;
+            /* El tamaño ahora se define dinámicamente con JS */
             --rotation: 0deg; /* Variable CSS para la rotación final */
             transition: top linear; /* Solo animamos la caída con transition */
             animation: sway ease-in-out infinite alternate; /* La animación de balanceo es permanente */
@@ -136,20 +135,20 @@
 
     <!-- Pantalla Inicial con el botón -->
     <main id="initial-screen">
-        <h1>Un Pequeño Regalo para Ti</h1>
+        <h1>Para la niña más hermosa que conozco</h1>
         <button id="gift-button">Abrir Regalo</button>
     </main>
     
     <!-- Contenedor para las flores y el mensaje -->
     <div id="animation-container">
         <div class="message" id="animatedMessage">
-            Son para ti tontita, no serán físicas aún, pero al menos te puedo dar unas virtuales con lo que sé hacer.
+            Son para ti, Dess. No serán físicas aún, pero al menos te puedo dar unas virtuales con lo que sé hacer.
         </div>
     </div>
 
-    <!-- Elemento de audio -->
+    <!-- Elemento de audio con melodía de piano -->
     <audio id="background-music" loop>
-        <source src="https://www.chosic.com/wp-content/uploads/2022/01/childhood.mp3" type="audio/mpeg">
+        <source src="https://www.chosic.com/wp-content/uploads/2021/04/Once-Again-chosic.com_.mp3" type="audio/mpeg">
         Tu navegador no soporta el elemento de audio.
     </audio>
 
@@ -160,30 +159,36 @@
         const animatedMessage = document.getElementById('animatedMessage');
         const backgroundMusic = document.getElementById('background-music');
         
-        const numberOfFlowers = 200;
-        const flowerWidth = 60; // Ancho de la flor para los cálculos de colisión
-        const flowerHeight = 60; // Alto de la flor
+        // Optimización para móviles: Menos flores en pantallas pequeñas
+        const isMobile = window.innerWidth <= 768;
+        const numberOfFlowers = isMobile ? 60 : 200;
+        
+        const baseFlowerWidth = 60; // Ancho base de la flor para calcular las columnas
 
         // Preparamos las "columnas" para apilar las flores y evitar superposiciones
-        const numSlots = Math.floor(window.innerWidth / flowerWidth);
-        // Array para guardar la altura actual de la pila en cada columna
-        // Se inicia con la altura de la ventana (el suelo)
+        const numSlots = Math.floor(window.innerWidth / baseFlowerWidth);
         let pileHeights = new Array(numSlots).fill(window.innerHeight);
 
+        // SVG de la flor mejorado
         const flowerSVG = `
-            <svg viewBox="-60 -60 120 120" xmlns="http://www.w3.org/2000/svg">
+            <svg viewBox="-50 -50 100 100" xmlns="http://www.w.org/2000/svg">
+                <defs>
+                    <radialGradient id="centerGradient">
+                        <stop offset="0%" stop-color="#FFD700" />
+                        <stop offset="100%" stop-color="#FFA500" />
+                    </radialGradient>
+                </defs>
                 <g>
-                    <!-- Creamos 8 pétalos rotando una sola forma -->
-                    <path d="M0,0 Q-15,-30 0,-50 Q15,-30 0,0 Z" fill="${getComputedStyle(document.documentElement).getPropertyValue('--primary-yellow')}" transform="rotate(0)"/>
-                    <path d="M0,0 Q-15,-30 0,-50 Q15,-30 0,0 Z" fill="${getComputedStyle(document.documentElement).getPropertyValue('--primary-yellow')}" transform="rotate(45)"/>
-                    <path d="M0,0 Q-15,-30 0,-50 Q15,-30 0,0 Z" fill="${getComputedStyle(document.documentElement).getPropertyValue('--primary-yellow')}" transform="rotate(90)"/>
-                    <path d="M0,0 Q-15,-30 0,-50 Q15,-30 0,0 Z" fill="${getComputedStyle(document.documentElement).getPropertyValue('--primary-yellow')}" transform="rotate(135)"/>
-                    <path d="M0,0 Q-15,-30 0,-50 Q15,-30 0,0 Z" fill="${getComputedStyle(document.documentElement).getPropertyValue('--primary-yellow')}" transform="rotate(180)"/>
-                    <path d="M0,0 Q-15,-30 0,-50 Q15,-30 0,0 Z" fill="${getComputedStyle(document.documentElement).getPropertyValue('--primary-yellow')}" transform="rotate(225)"/>
-                    <path d="M0,0 Q-15,-30 0,-50 Q15,-30 0,0 Z" fill="${getComputedStyle(document.documentElement).getPropertyValue('--primary-yellow')}" transform="rotate(270)"/>
-                    <path d="M0,0 Q-15,-30 0,-50 Q15,-30 0,0 Z" fill="${getComputedStyle(document.documentElement).getPropertyValue('--primary-yellow')}" transform="rotate(315)"/>
+                    <path d="M0 -15 C 20 -30, 20 -45, 0 -50 C -20 -45, -20 -30, 0 -15" fill="${getComputedStyle(document.documentElement).getPropertyValue('--primary-yellow')}" transform="rotate(0)"/>
+                    <path d="M0 -15 C 20 -30, 20 -45, 0 -50 C -20 -45, -20 -30, 0 -15" fill="${getComputedStyle(document.documentElement).getPropertyValue('--primary-yellow')}" transform="rotate(45)"/>
+                    <path d="M0 -15 C 20 -30, 20 -45, 0 -50 C -20 -45, -20 -30, 0 -15" fill="${getComputedStyle(document.documentElement).getPropertyValue('--primary-yellow')}" transform="rotate(90)"/>
+                    <path d="M0 -15 C 20 -30, 20 -45, 0 -50 C -20 -45, -20 -30, 0 -15" fill="${getComputedStyle(document.documentElement).getPropertyValue('--primary-yellow')}" transform="rotate(135)"/>
+                    <path d="M0 -15 C 20 -30, 20 -45, 0 -50 C -20 -45, -20 -30, 0 -15" fill="${getComputedStyle(document.documentElement).getPropertyValue('--primary-yellow')}" transform="rotate(180)"/>
+                    <path d="M0 -15 C 20 -30, 20 -45, 0 -50 C -20 -45, -20 -30, 0 -15" fill="${getComputedStyle(document.documentElement).getPropertyValue('--primary-yellow')}" transform="rotate(225)"/>
+                    <path d="M0 -15 C 20 -30, 20 -45, 0 -50 C -20 -45, -20 -30, 0 -15" fill="${getComputedStyle(document.documentElement).getPropertyValue('--primary-yellow')}" transform="rotate(270)"/>
+                    <path d="M0 -15 C 20 -30, 20 -45, 0 -50 C -20 -45, -20 -30, 0 -15" fill="${getComputedStyle(document.documentElement).getPropertyValue('--primary-yellow')}" transform="rotate(315)"/>
                 </g>
-                <circle cx="0" cy="0" r="15" fill="${getComputedStyle(document.documentElement).getPropertyValue('--center-orange')}"/>
+                <circle cx="0" cy="0" r="18" fill="url(#centerGradient)"/>
             </svg>
         `;
 
@@ -192,72 +197,64 @@
             flower.classList.add('flower');
             flower.innerHTML = flowerSVG;
             
-            // Duración de balanceo aleatoria para un efecto más natural
-            const swayDuration = Math.random() * 2 + 3;   // Entre 3 y 5 segundos
+            const swayDuration = Math.random() * 2 + 3;
             flower.style.animationDuration = `${swayDuration}s`;
 
-            return flower;
+            // --- Nueva lógica para tamaño variable ---
+            const scale = 0.7 + Math.random() * 0.6; // Escala entre 0.7 y 1.3
+            const finalSize = baseFlowerWidth * scale;
+            
+            flower.style.width = `${finalSize}px`;
+            flower.style.height = `${finalSize}px`;
+
+            return { element: flower, size: finalSize }; // Devolvemos el elemento y su tamaño
         }
 
         function startAnimation() {
-            // Generar flores a intervalos
             for (let i = 0; i < numberOfFlowers; i++) {
                 setTimeout(() => {
-                    const newFlower = createFlower();
+                    // Obtenemos la flor y su tamaño
+                    const { element: newFlower, size: flowerSize } = createFlower();
                     
-                    // --- Lógica de Colisión/Apilamiento ---
-                    // 1. Elegir una columna (slot) al azar para que caiga la flor
                     const slotIndex = Math.floor(Math.random() * numSlots);
-
-                    // 2. Calcular la posición X final con una pequeña variación para que no sea una línea perfecta
-                    const finalX = (slotIndex * flowerWidth) + (Math.random() * 10 - 5);
+                    const finalX = (slotIndex * baseFlowerWidth) + (Math.random() * 10 - 5);
                     newFlower.style.left = `${finalX}px`;
 
-                    // 3. Calcular la posición Y final basada en la altura actual de la pila en esa columna
                     const pileTop = pileHeights[slotIndex];
-                    // La flor se posará un poco encima de la anterior para un efecto más natural
-                    const finalY = pileTop - (flowerHeight * 0.4); 
+                    // Usamos el tamaño real de la flor para la lógica de apilamiento
+                    const finalY = pileTop - (flowerSize * 0.4); 
 
-                    // 4. Actualizar la altura de la pila para la siguiente flor que caiga en esta columna
                     pileHeights[slotIndex] = finalY;
-                    // --- Fin de la Lógica de Colisión ---
 
                     animationContainer.appendChild(newFlower);
-
-                    // Forzar un reflow del navegador para que la transición se aplique correctamente
                     void newFlower.offsetWidth;
 
-                    // Calcular el resto de la animación
-                    const finalRotation = Math.random() * 90 - 45; // Rotación final entre -45 y 45 grados
-                    const fallDuration = Math.random() * 5 + 8; // Duración de caída entre 8 y 13 segundos
+                    const finalRotation = Math.random() * 90 - 45;
+                    const fallDuration = Math.random() * 5 + 8;
 
-                    // Aplicar los estilos finales para iniciar la transición de caída
                     newFlower.style.transition = `top ${fallDuration}s linear`;
                     newFlower.style.setProperty('--rotation', `${finalRotation}deg`);
                     newFlower.style.top = `${finalY}px`;
 
-                }, i * 100); // Espaciar la creación de cada flor 100ms
+                }, i * 150); // Aumentamos un poco el tiempo para que no se sature en móvil
             }
 
             // Mostrar el mensaje cuando la flor número 25 es creada
+            const messageDelay = isMobile ? (24 * 150) : (24 * 100);
             setTimeout(() => {
                 animatedMessage.classList.add('show');
-            }, 24 * 100); // 24 * 100ms = 2.4 segundos
+            }, messageDelay);
         }
         
         giftButton.addEventListener('click', () => {
-            // Ocultar la pantalla inicial
             initialScreen.classList.add('hidden');
             
-            // Reproducir música (los navegadores modernos requieren interacción del usuario)
             backgroundMusic.play().catch(error => {
                 console.log("La reproducción automática fue prevenida por el navegador.");
             });
 
-            // Iniciar la animación de flores y el mensaje después de que la pantalla inicial se desvanezca
             setTimeout(startAnimation, 1000);
         });
     </script>
 </body>
 </html>
-
