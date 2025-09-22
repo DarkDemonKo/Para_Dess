@@ -35,6 +35,7 @@
             align-items: center;
             text-align: center;
             transition: opacity 1s ease-out, transform 1s ease-out;
+            padding: 0 15px; /* Añade un poco de espacio lateral en móviles */
         }
 
         #initial-screen.hidden {
@@ -127,6 +128,18 @@
             }
             to {
                 transform: rotate(calc(var(--rotation) + 5deg)) translateX(15px);
+            }
+        }
+
+        /* --- Ajustes responsivos para móviles --- */
+        @media (max-width: 768px) {
+            #initial-screen h1 {
+                font-size: 2.8em; /* Reducir tamaño para pantallas pequeñas */
+            }
+
+            .message {
+                font-size: 2em; /* Reducir tamaño del mensaje final */
+                padding: 15px 20px;
             }
         }
     </style>
